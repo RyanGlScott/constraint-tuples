@@ -4,7 +4,7 @@
 -- to invoke this.
 module Main (main) where
 
-import Data.List
+import Data.List.Compat
 import Prelude ()
 import Prelude.Compat
 import Options.Applicative
