@@ -3,8 +3,7 @@
 [![Hackage Dependencies](https://img.shields.io/hackage-deps/v/constraint-tuples.svg)](http://packdeps.haskellers.com/reverse/constraint-tuples)
 [![Haskell Programming Language](https://img.shields.io/badge/language-Haskell-blue.svg)][Haskell.org]
 [![BSD3 License](http://img.shields.io/badge/license-BSD3-brightgreen.svg)][tl;dr Legal: BSD3]
-[![Linux build](https://img.shields.io/travis/RyanGlScott/constraint-tuples.svg)](https://travis-ci.org/RyanGlScott/constraint-tuples)
-[![Windows build](https://ci.appveyor.com/api/projects/status/fy1q86lbfttmnthy?svg=true)](https://ci.appveyor.com/project/RyanGlScott/constraint-tuples)
+[![Build](https://img.shields.io/travis/RyanGlScott/constraint-tuples.svg)](https://travis-ci.org/RyanGlScott/constraint-tuples)
 
 [Hackage: constraint-tuples]:
   http://hackage.haskell.org/package/constraint-tuples
