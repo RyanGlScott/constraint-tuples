@@ -10,6 +10,7 @@
 #if __GLASGOW_HASKELL__ >= 800
 {-# LANGUAGE UndecidableSuperClasses #-}
 #endif
+{-# LANGUAGE Safe #-}
 -- | This module provides classes that emulate the behavior of GHC's constraint
 -- tuple syntax. Unlike GHC's built-in constraint tuples, the classes in this
 -- library can be partially applied.

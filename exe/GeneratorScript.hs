@@ -84,7 +84,8 @@ preamble Args{classNewtype} =
   , "#if __GLASGOW_HASKELL__ >= 800"
   , "{-# LANGUAGE UndecidableSuperClasses #-}"
   , "#endif"
-  , "-- | This module provides classes that emulate the behavior of GHC's constraint"
+  ] ++ safeHaskell ++
+  [ "-- | This module provides classes that emulate the behavior of GHC's constraint"
   , "-- tuple syntax. Unlike GHC's built-in constraint tuples, the classes in this"
   , "-- library can be partially applied."
   , "--"
@@ -126,6 +127,17 @@ preamble Args{classNewtype} =
               ]
             | otherwise
             = []
+
+    safeHaskell :: [String]
+    safeHaskell | classNewtype
+                = [ "#if __GLASGOW_HASKELL__ >= 800"
+                  , "{-# LANGUAGE Safe #-}"
+                  , "#else"
+                  , "{-# LANGUAGE Trustworthy #-}"
+                  , "#endif"
+                  ]
+                | otherwise
+                = [ "{-# LANGUAGE Safe #-}" ]
 
     haddockNote :: [String]
     haddockNote
