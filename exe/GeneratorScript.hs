@@ -5,6 +5,7 @@
 module Main (main) where
 
 import Data.List.Compat
+import GHC.Exts (maxTupleSize)
 import Prelude ()
 import Prelude.Compat
 import Options.Applicative
@@ -40,7 +41,7 @@ generate args@Args{output} =
   let sourceCode = unlines $ preamble args ++ decs args in
   writeFile output sourceCode
 
-genCTuple :: Args -> Word -> String
+genCTuple :: Args -> Int -> String
 genCTuple Args{classNewtype} n
   | n == 0    = "CTuple0"
   | otherwise = parens (concat (intersperse ", " cNums))
@@ -57,7 +58,7 @@ genCTuple Args{classNewtype} n
     cNums :: [String]
     cNums = ['c':show i | i <- [1..n]]
 
-haddocks :: Word -> [String]
+haddocks :: Int -> [String]
 haddocks i =
   [ "-- | A constraint tuple class with " ++ show i ++ " arguments."
   ] ++
@@ -66,9 +67,6 @@ haddocks i =
        , "-- This class is only defined on GHC 7.8 or later."
        ]
   else []
-
-maxTupleSize :: Word
-maxTupleSize = 62
 
 preamble :: Args -> [String]
 preamble Args{classNewtype} =
