@@ -92,7 +92,7 @@ class    CTuple0
 instance CTuple0
 #endif
 
--- | A constraint tuple class with 1 arguments.
+-- | A constraint tuple class with 1 argument.
 class    c1 => CTuple1 c1
 instance c1 => CTuple1 c1
 

@@ -60,13 +60,20 @@ genCTuple Args{classNewtype} n
 
 haddocks :: Int -> [String]
 haddocks i =
-  [ "-- | A constraint tuple class with " ++ show i ++ " arguments."
+  [ "-- | A constraint tuple class with " ++ show i ++
+    " argument" ++ pluralSuffix ++ "."
   ] ++
   if i == 0
   then [ "--"
        , "-- This class is only defined on GHC 7.8 or later."
        ]
   else []
+  where
+    pluralSuffix :: String
+    pluralSuffix | i == 1
+                 = ""
+                 | otherwise
+                 = "s"
 
 preamble :: Args -> [String]
 preamble Args{classNewtype} =
