@@ -1,6 +1,6 @@
 cabal-version:       >=1.10
 name:                constraint-tuples
-version:             0.1
+version:             0.1.1
 synopsis:            Partially applicable constraint tuples
 description:         This library provides classes that emulate the behavior of
                      GHC's constraint tuple syntax. Unlike GHC's built-in
