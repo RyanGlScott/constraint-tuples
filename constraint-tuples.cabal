@@ -27,7 +27,12 @@ stability:           Stable
 copyright:           (C) 2018-2019 Ryan Scott
 category:            Data
 build-type:          Simple
-extra-source-files:  CHANGELOG.md, README.md, GenCTuples.sh
+extra-source-files:  CHANGELOG.md
+                     README.md
+                     GenCTuples.sh
+                     generator-script/LICENSE
+                     generator-script/generator-script.cabal
+                     generator-script/exe/GeneratorScript.hs
 tested-with:         GHC == 7.6.3
                    , GHC == 7.8.4
                    , GHC == 7.10.3
@@ -41,11 +46,6 @@ source-repository head
   type:                git
   location:            https://github.com/RyanGlScott/constraint-tuples
 
-flag generator-script
-  description:         Build the script which generates the source code for
-                       this library.
-  default:             False
-
 library
   exposed-modules:     Data.Tuple.Constraint
                        Data.Tuple.Constraint.ClassNewtype
@@ -53,15 +53,3 @@ library
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:         -Wall
-
-executable generator-script
-  if !flag(generator-script)
-    buildable:         False
-
-  main-is:             GeneratorScript.hs
-  build-depends:       base                  >= 4.6  && < 5
-                     , base-compat-batteries >= 0.10 && < 0.12
-                     , optparse-applicative  >= 0.13 && < 0.16
-  hs-source-dirs:      exe
-  default-language:    Haskell2010
-  ghc-options:         -Wall -threaded -rtsopts

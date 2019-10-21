@@ -1,4 +1,2 @@
 packages: .
-
-package constraint-tuples
-  flags: +generator-script
+          ./generator-script
