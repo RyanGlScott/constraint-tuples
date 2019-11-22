@@ -15,14 +15,23 @@
   https://tldrlegal.com/license/bsd-3-clause-license-%28revised%29
   "BSD 3-Clause License (Revised)"
 
-This library provides classes that emulate the behavior of GHC's constraint
-tuple syntax. Unlike GHC's built-in constraint tuples, the classes in this
-library can be partially applied.
+This library provides classes and type aliases that emulate the behavior of
+GHC's constraint tuple syntax. Unlike GHC's built-in constraint tuples, the
+types in this library can be partially applied.
 
-This library exposes two different modules that are semantically identical, but
-compile to slightly different Core:
+This library exposes four different modules that provide essentially the same
+API with slight differences in their implementation:
 
 * `Data.Tuple.Constraint`: A `CTupleN` class compiles to a dictionary data type
    with `N` fields.
 * `Data.Tuple.Constraint.ClassNewtype`: A `CTupleN` class compiles to a newtype
    around the corresponding built-in constraint tuple type with `N` arguments.
+* `Data.Tuple.Constraint.TypeFamily`: A `CTupleN` type alias is a constraint
+  tuple type constructor with `N` arguments obtained by way of a type family.
+  This will compile to a built-in constraint tuple, but casted with a
+  type family axiom.
+* `Data.Tuple.Constraint.TypeSynonym`: A `CTupleN` type alias is a constraint
+  tuple type constructor with `N` arguments obtained by way of a type synonym.
+  This will compile directly to a built-in constraint tuple, but because this
+  requires use of GHC features only present on 8.0 or later, this module does
+  not export anything on earlier versions of GHC.

@@ -1,7 +1,7 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE CPP #-}
-{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE UndecidableInstances #-}
 #if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
@@ -11,10 +11,10 @@
 {-# LANGUAGE UndecidableSuperClasses #-}
 #endif
 {-# LANGUAGE Safe #-}
+
 -- | This module provides classes that emulate the behavior of GHC's constraint
 -- tuple syntax. Unlike GHC's built-in constraint tuples, the classes in this
 -- library can be partially applied.
---
 module Data.Tuple.Constraint
   ( -- * Constraint tuples
 #if __GLASGOW_HASKELL__ >= 708

@@ -1,4 +1,7 @@
 ### next [????.??.??]
+* Introduce the `Data.Tuple.Constraint.{TypeFamily,TypeSynonym}` modules that
+  provide ways of directly accessing constraint tuple type constructors through
+  various means of type-level trickery.
 * Make `Data.Tuple.Constraint.ClassNewtype.CTuple0` actually be a class
   newtype.
 
