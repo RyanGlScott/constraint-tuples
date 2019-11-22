@@ -114,15 +114,19 @@ module Data.Tuple.Constraint.ClassNewtype
   , CTuple62
   ) where
 
-import Data.Tuple.Constraint ( CTuple1
-#if __GLASGOW_HASKELL__ >= 708
-                             , CTuple0
-#endif
-                             )
+import Data.Tuple.Constraint (CTuple1)
 #if __GLASGOW_HASKELL__ >= 800
 import Data.Kind (Constraint)
 #else
 import GHC.Exts (Constraint)
+#endif
+
+#if __GLASGOW_HASKELL__ >= 708
+-- | A constraint tuple class with 0 arguments.
+--
+-- This class is only defined on GHC 7.8 or later.
+class    (() :: Constraint) => CTuple0
+instance (() :: Constraint) => CTuple0
 #endif
 
 -- | A constraint tuple class with 2 arguments.

@@ -88,8 +88,8 @@ module Data.Tuple.Constraint
 -- | A constraint tuple class with 0 arguments.
 --
 -- This class is only defined on GHC 7.8 or later.
-class    CTuple0
-instance CTuple0
+class    () => CTuple0
+instance () => CTuple0
 #endif
 
 -- | A constraint tuple class with 1 argument.

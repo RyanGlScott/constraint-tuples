@@ -51,10 +51,11 @@ generate args@Args{output} =
   writeFile output sourceCode
 
 genCTuple :: Args -> Int -> String
-genCTuple Args{mode} n
-  | n == 0    = "CTuple0"
-  | otherwise = parens (concat (intersperse ", " cNums))
-             ++ " => CTuple" ++ show n ++ " " ++ unwords cNums
+genCTuple Args{mode} n =
+     parens (concat (intersperse ", " cNums))
+  ++ " => CTuple" ++ show n
+  ++ [ ' ' | n > 0 ]
+  ++ unwords cNums
   where
     parens :: String -> String
     parens s | n == 1    = s
@@ -133,11 +134,7 @@ preamble Args{mode} =
     imports =
       case mode of
         ClassNewtype ->
-          [ "import Data.Tuple.Constraint ( CTuple1"
-          , "#if __GLASGOW_HASKELL__ >= 708"
-          , "                             , CTuple0"
-          , "#endif"
-          , "                             )"
+          [ "import Data.Tuple.Constraint (CTuple1)"
           , "#if __GLASGOW_HASKELL__ >= 800"
           , "import Data.Kind (Constraint)"
           , "#else"
@@ -201,8 +198,8 @@ decs args@Args{mode} =
     let cTuple = genCTuple args i in
     case mode of
       ClassNewtype
-        |  i == 0 || i == 1
-        -> [] -- CTuple{0,1} are imported from Data.Tuple.Constraint
+        |  i == 1
+        -> [] -- CTuple1 is imported from Data.Tuple.Constraint
       _ -> concat
              [ [ "#if __GLASGOW_HASKELL__ >= 708" | i == 0 ]
              , haddocks i
