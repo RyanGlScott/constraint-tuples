@@ -11,9 +11,14 @@ import Prelude.Compat
 import Options.Applicative
 
 data Args = Args
-  { output       :: FilePath
-  , classNewtype :: Bool
+  { output :: FilePath
+  , mode   :: Mode
   } deriving Show
+
+data Mode
+  = Default
+  | ClassNewtype
+  deriving (Bounded, Enum, Read, Show)
 
 argsParser :: Parser Args
 argsParser = Args
@@ -22,9 +27,13 @@ argsParser = Args
       <> short 'o'
       <> metavar "PATH"
       <> help "The file to which to write the source code" )
-  <*> switch
-      (  long "class-newtype"
-      <> help "Generate the source code for Data.Tuple.Constraint.ClassNewtype" )
+  <*> option auto
+      (  long "mode"
+      <> short 'm'
+      <> value Default
+      <> help (unlines [ "Which version of Data.Tuple.Constraint should be generated?"
+                       , "(" ++ intercalate ", " (map show [minBound..maxBound :: Mode]) ++ ")"
+                       ]) )
 
 main :: IO ()
 main = execParser opts >>= generate
@@ -34,7 +43,7 @@ main = execParser opts >>= generate
      <> progDesc spiel
      <> header spiel )
 
-    spiel = "Generate the source code for Data.Tuple.Constraint{,.ClassNewtype}"
+    spiel = "Generate the source code for Data.Tuple.Constraint and friends"
 
 generate :: Args -> IO ()
 generate args@Args{output} =
@@ -42,7 +51,7 @@ generate args@Args{output} =
   writeFile output sourceCode
 
 genCTuple :: Args -> Int -> String
-genCTuple Args{classNewtype} n
+genCTuple Args{mode} n
   | n == 0    = "CTuple0"
   | otherwise = parens (concat (intersperse ", " cNums))
              ++ " => CTuple" ++ show n ++ " " ++ unwords cNums
@@ -52,8 +61,10 @@ genCTuple Args{classNewtype} n
              | otherwise = kindSig $ "(" ++ s ++ ")"
 
     kindSig :: String -> String
-    kindSig s | classNewtype = "(" ++ s ++ " :: Constraint)"
-              | otherwise    = s
+    kindSig s =
+      case mode of
+        ClassNewtype -> "(" ++ s ++ " :: Constraint)"
+        Default      -> s
 
     cNums :: [String]
     cNums = ['c':show i | i <- [1..n]]
@@ -76,7 +87,7 @@ haddocks i =
                  = "s"
 
 preamble :: Args -> [String]
-preamble Args{classNewtype} =
+preamble Args{mode} =
   [ "{-# LANGUAGE ConstraintKinds #-}"
   , "{-# LANGUAGE CPP #-}"
   , "{-# LANGUAGE FlexibleInstances #-}"
@@ -104,7 +115,9 @@ preamble Args{classNewtype} =
   where
     modName :: String
     modName = "Data.Tuple.Constraint" ++
-              if classNewtype then ".ClassNewtype" else ""
+              case mode of
+                Default -> ""
+                _       -> '.' : show mode
 
     exports :: [String]
     exports = flip concatMap [0..maxTupleSize] $ \i ->
@@ -117,78 +130,85 @@ preamble Args{classNewtype} =
                   _ -> [ "  , CTuple" ++ show i ]
 
     imports :: [String]
-    imports | classNewtype
-            = [ "import Data.Tuple.Constraint ( CTuple1"
-              , "#if __GLASGOW_HASKELL__ >= 708"
-              , "                             , CTuple0"
-              , "#endif"
-              , "                             )"
-              , "#if __GLASGOW_HASKELL__ >= 800"
-              , "import Data.Kind (Constraint)"
-              , "#else"
-              , "import GHC.Exts (Constraint)"
-              , "#endif"
-              , ""
-              ]
-            | otherwise
-            = []
+    imports =
+      case mode of
+        ClassNewtype ->
+          [ "import Data.Tuple.Constraint ( CTuple1"
+          , "#if __GLASGOW_HASKELL__ >= 708"
+          , "                             , CTuple0"
+          , "#endif"
+          , "                             )"
+          , "#if __GLASGOW_HASKELL__ >= 800"
+          , "import Data.Kind (Constraint)"
+          , "#else"
+          , "import GHC.Exts (Constraint)"
+          , "#endif"
+          , ""
+          ]
+        Default ->
+          []
 
     safeHaskell :: [String]
-    safeHaskell | classNewtype
-                = [ "#if __GLASGOW_HASKELL__ >= 800"
-                  , "{-# LANGUAGE Safe #-}"
-                  , "#else"
-                  , "{-# LANGUAGE Trustworthy #-}"
-                  , "#endif"
-                  ]
-                | otherwise
-                = [ "{-# LANGUAGE Safe #-}" ]
+    safeHaskell =
+      case mode of
+        ClassNewtype ->
+          [ "#if __GLASGOW_HASKELL__ >= 800"
+          , "{-# LANGUAGE Safe #-}"
+          , "#else"
+          , "{-# LANGUAGE Trustworthy #-}"
+          , "#endif"
+          ]
+        Default ->
+          [ "{-# LANGUAGE Safe #-}" ]
 
     haddockNote :: [String]
-    haddockNote
-      | classNewtype
-      = [ "-- Unlike \"Data.Tuple.Constraint\", a @CTupleN@ class defined in this module"
-        , "-- (where @N@ is greater than 1) compiles to a newtype around the corresponding"
-        , "-- built-in constraint tuple type with @N@ arguments in Core. In contrast, a"
-        , "-- @CTupleN@ class defined in \"Data.Tuple.Constraint\" compiles to a"
-        , "-- dictionary data type with @N@ fields in Core."
-        , "--"
-        , "-- For most use cases, this distinction is of no practical consequence. One"
-        , "-- scenario where you may benefit from using this module is when you are"
-        , "-- interoperating with built-in constraint tuple syntax."
-        , "-- For example, in this code:"
-        , "--"
-        , "-- @"
-        , "-- data Dict :: Constraint -> Type where"
-        , "--   Dict :: c => Dict c"
-        , "--"
-        , "-- foo :: CTuple2 a b => Dict (a, b)"
-        , "-- foo = Dict"
-        , "-- @"
-        , "--"
-        , "-- If you use the @CTuple2@ class from \"Data.Tuple.Constraint\" to define"
-        , "-- @foo@, then in the Core for @foo@, the @a@ and @b@ must be extracted from"
-        , "-- the @CTuple2@ dictionary before building the @Dict@ dictionary. On the other"
-        , "-- hand, if you use the @CTuple@ class from this module, then no such"
-        , "-- extraction is necessary, as the Core can simply cast the @CTuple2@"
-        , "-- dictionary (which is a newtype) to the @(a, b)@ dictionary and use that to"
-        , "-- construct a @Dict@ dictionary."
-        ]
-      | otherwise
-      = []
+    haddockNote =
+      case mode of
+        ClassNewtype ->
+          [ "-- Unlike \"Data.Tuple.Constraint\", a @CTupleN@ class defined in this module"
+          , "-- (where @N@ is greater than 1) compiles to a newtype around the corresponding"
+          , "-- built-in constraint tuple type with @N@ arguments in Core. In contrast, a"
+          , "-- @CTupleN@ class defined in \"Data.Tuple.Constraint\" compiles to a"
+          , "-- dictionary data type with @N@ fields in Core."
+          , "--"
+          , "-- For most use cases, this distinction is of no practical consequence. One"
+          , "-- scenario where you may benefit from using this module is when you are"
+          , "-- interoperating with built-in constraint tuple syntax."
+          , "-- For example, in this code:"
+          , "--"
+          , "-- @"
+          , "-- data Dict :: Constraint -> Type where"
+          , "--   Dict :: c => Dict c"
+          , "--"
+          , "-- foo :: CTuple2 a b => Dict (a, b)"
+          , "-- foo = Dict"
+          , "-- @"
+          , "--"
+          , "-- If you use the @CTuple2@ class from \"Data.Tuple.Constraint\" to define"
+          , "-- @foo@, then in the Core for @foo@, the @a@ and @b@ must be extracted from"
+          , "-- the @CTuple2@ dictionary before building the @Dict@ dictionary. On the other"
+          , "-- hand, if you use the @CTuple@ class from this module, then no such"
+          , "-- extraction is necessary, as the Core can simply cast the @CTuple2@"
+          , "-- dictionary (which is a newtype) to the @(a, b)@ dictionary and use that to"
+          , "-- construct a @Dict@ dictionary."
+          ]
+        Default ->
+          []
 
 decs :: Args -> [String]
-decs args@Args{classNewtype} =
+decs args@Args{mode} =
   flip concatMap [0..maxTupleSize] $ \i ->
     let cTuple = genCTuple args i in
-    if classNewtype && (i == 0 || i == 1)
-       then [] -- CTuple{0,1} are imported from Data.Tuple.Constraint
-       else concat
-              [ [ "#if __GLASGOW_HASKELL__ >= 708" | i == 0 ]
-              , haddocks i
-              , [ "class    " ++ cTuple
-                , "instance " ++ cTuple
-                ]
-              , [ "#endif" | i == 0 ]
-              , [ "" ]
-              ]
+    case mode of
+      ClassNewtype
+        |  i == 0 || i == 1
+        -> [] -- CTuple{0,1} are imported from Data.Tuple.Constraint
+      _ -> concat
+             [ [ "#if __GLASGOW_HASKELL__ >= 708" | i == 0 ]
+             , haddocks i
+             , [ "class    " ++ cTuple
+               , "instance " ++ cTuple
+               ]
+             , [ "#endif" | i == 0 ]
+             , [ "" ]
+             ]
