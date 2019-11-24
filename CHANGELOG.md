@@ -1,4 +1,4 @@
-### next [????.??.??]
+### 0.1.2 [2019.11.24]
 * Introduce the `Data.Tuple.Constraint.{TypeFamily,TypeSynonym}` modules that
   provide ways of directly accessing constraint tuple type constructors through
   various means of type-level trickery.
