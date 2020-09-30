@@ -4,7 +4,7 @@
 -- to invoke this.
 module Main (main) where
 
-import Data.List.Compat
+import Data.List.Compat (intercalate, intersperse)
 import GHC.Exts (maxTupleSize)
 import Prelude ()
 import Prelude.Compat
