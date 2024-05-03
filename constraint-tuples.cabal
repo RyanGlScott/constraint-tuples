@@ -12,7 +12,9 @@ description:         This library provides classes and type aliases that
                      implementation:
                      .
                      * "Data.Tuple.Constraint": A @CTupleN@ class compiles to
-                       a dictionary data type with @N@ fields.
+                       a dictionary data type with @N@ fields. (When building
+                       with GHC 9.10 or later, this will simply re-export the
+                       constraint tuples offered by "GHC.Classes".)
                      .
                      * "Data.Tuple.Constraint.ClassNewtype": A @CTupleN@ class
                        compiles to a newtype around the corresponding built-in

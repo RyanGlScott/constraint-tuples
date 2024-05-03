@@ -23,7 +23,8 @@ This library exposes four different modules that provide essentially the same
 API with slight differences in their implementation:
 
 * `Data.Tuple.Constraint`: A `CTupleN` class compiles to a dictionary data type
-   with `N` fields.
+   with `N` fields. (When building with GHC 9.10 or later, this will simply
+   re-export the constraint tuples offered by `GHC.Classes`.)
 * `Data.Tuple.Constraint.ClassNewtype`: A `CTupleN` class compiles to a newtype
    around the corresponding built-in constraint tuple type with `N` arguments.
 * `Data.Tuple.Constraint.TypeFamily`: A `CTupleN` type alias is a constraint
