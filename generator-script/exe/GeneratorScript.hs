@@ -5,7 +5,6 @@
 module Main (main) where
 
 import Data.List.Compat (intercalate, intersperse)
-import GHC.Exts (maxTupleSize)
 import Prelude ()
 import Prelude.Compat
 import Options.Applicative
@@ -206,7 +205,9 @@ preamble Args{mode} =
                else [ "    CTuple0" ]
           1 |  mode `elem` classDefModes
             -> [ "    CTuple1" ]
-          _ -> [ "  , CTuple" ++ show i ]
+          _ -> [ "#if __GLASGOW_HASKELL__ >= 902" | largeTupleSize i ] ++
+               [ "  , CTuple" ++ show i ] ++
+               [ "#endif" | largeTupleSize i ]
       where
         classDefModes :: [Mode]
         classDefModes = [Default, ClassNewtype]
@@ -327,18 +328,42 @@ decs Args{mode} =
       let cTuple = genClassDef classNewtype i in
       concat
         [ [ "#if __GLASGOW_HASKELL__ >= 708" | i == 0 ]
+        , [ "#if __GLASGOW_HASKELL__ >= 902" | largeTupleSize i ]
         , classDefHaddocks i
         , [ "class    " ++ cTuple
           , "instance " ++ cTuple
           ]
-        , [ "#endif" | i == 0 ]
+        , [ "#endif" | i == 0 || largeTupleSize i ]
         ]
 
     genAliasDefs :: Bool -- True for type families, False for type synonyms
                  -> Int -> [String]
     genAliasDefs typeFams i =
-        aliasHaddocks i
-      : genAlias typeFams i
-      : if typeFams
-           then   genTypeFamilyDecomposers i
-           else [ genTypeSynonymDecomposer i ]
+      concat
+        [ [ "#if __GLASGOW_HASKELL__ >= 902" | largeTupleSize i ]
+        , [ aliasHaddocks i
+          , genAlias typeFams i
+          ]
+        , if typeFams
+             then   genTypeFamilyDecomposers i
+             else [ genTypeSynonymDecomposer i ]
+        , [ "#endif" | largeTupleSize i ]
+        ]
+
+-- | The maximum tuple size to generate.
+--
+-- This should stay in sync with the value of @GHC.Exts.maxTupleSize@. We define
+-- it here separately because different versions of GHC have different values
+-- of @GHC.Exts.maxTupleSize@, and we want the generator script to produce the
+-- same output regardless of which GHC version is used to build the script.
+maxTupleSize :: Int
+maxTupleSize = 64
+
+-- GHC 8.0 through 9.0 impose a maximum tuple size of 62, so one cannot define
+-- constraint tuples of larger sizes. GHC 9.2 and later, however, raise the
+-- maximum tuple size to 64 (see 'maxTupleSize' above). We would still like to
+-- define 63- and 64- tuples whenever possible, so we use this function to check
+-- if a tuple is too large for old GHCs (and therefore needs to be guarded by
+-- appropriate CPP).
+largeTupleSize :: Int -> Bool
+largeTupleSize i = i > 62

@@ -79,6 +79,12 @@ module Data.Tuple.Constraint.TypeFamily
   , CTuple60
   , CTuple61
   , CTuple62
+#if __GLASGOW_HASKELL__ >= 902
+  , CTuple63
+#endif
+#if __GLASGOW_HASKELL__ >= 902
+  , CTuple64
+#endif
   ) where
 
 import Data.Tuple.Constraint (CTuple1)
@@ -397,4 +403,18 @@ type instance Decomposer61 (f c1 c2 c3 c4 c5 c6 c7 c8 c9 c10 c11 c12 c13 c14 c15
 type CTuple62 = Decomposer62 (((), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), ()) :: Constraint)
 type family   Decomposer62 (x :: Constraint) :: Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint
 type instance Decomposer62 (f c1 c2 c3 c4 c5 c6 c7 c8 c9 c10 c11 c12 c13 c14 c15 c16 c17 c18 c19 c20 c21 c22 c23 c24 c25 c26 c27 c28 c29 c30 c31 c32 c33 c34 c35 c36 c37 c38 c39 c40 c41 c42 c43 c44 c45 c46 c47 c48 c49 c50 c51 c52 c53 c54 c55 c56 c57 c58 c59 c60 c61 c62) = f
+
+#if __GLASGOW_HASKELL__ >= 902
+-- | A type alias for a constraint tuple with 63 arguments.
+type CTuple63 = Decomposer63 (((), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), ()) :: Constraint)
+type family   Decomposer63 (x :: Constraint) :: Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint
+type instance Decomposer63 (f c1 c2 c3 c4 c5 c6 c7 c8 c9 c10 c11 c12 c13 c14 c15 c16 c17 c18 c19 c20 c21 c22 c23 c24 c25 c26 c27 c28 c29 c30 c31 c32 c33 c34 c35 c36 c37 c38 c39 c40 c41 c42 c43 c44 c45 c46 c47 c48 c49 c50 c51 c52 c53 c54 c55 c56 c57 c58 c59 c60 c61 c62 c63) = f
+#endif
+
+#if __GLASGOW_HASKELL__ >= 902
+-- | A type alias for a constraint tuple with 64 arguments.
+type CTuple64 = Decomposer64 (((), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), (), ()) :: Constraint)
+type family   Decomposer64 (x :: Constraint) :: Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint -> Constraint
+type instance Decomposer64 (f c1 c2 c3 c4 c5 c6 c7 c8 c9 c10 c11 c12 c13 c14 c15 c16 c17 c18 c19 c20 c21 c22 c23 c24 c25 c26 c27 c28 c29 c30 c31 c32 c33 c34 c35 c36 c37 c38 c39 c40 c41 c42 c43 c44 c45 c46 c47 c48 c49 c50 c51 c52 c53 c54 c55 c56 c57 c58 c59 c60 c61 c62 c63 c64) = f
+#endif
 

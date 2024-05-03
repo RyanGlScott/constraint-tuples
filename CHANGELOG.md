@@ -1,3 +1,7 @@
+## next [????.??.??]
+* Provide constraint tuples up to size 64 when building with GHC 9.2 or later.
+  (Earlier versions of GHC impose a maximum tuple size of 62.)
+
 ### 0.1.2 [2019.11.24]
 * Introduce the `Data.Tuple.Constraint.{TypeFamily,TypeSynonym}` modules that
   provide ways of directly accessing constraint tuple type constructors through
