@@ -14,6 +14,8 @@ module Data.Tuple.Constraint.TypeFamily
   ( -- * Constraint tuples
     CTuple0
   , CTuple1
+  , CUnit
+  , CSolo
   , CTuple2
   , CTuple3
   , CTuple4
@@ -83,10 +85,11 @@ module Data.Tuple.Constraint.TypeFamily
 #endif
   ) where
 
-import Data.Tuple.Constraint (CTuple1)
+import Data.Tuple.Constraint (CTuple0, CTuple1, CSolo)
 import Data.Kind (Constraint)
+
 -- | A type alias for a constraint tuple with 0 arguments.
-type CTuple0 = Decomposer0 (() :: Constraint)
+type CUnit = Decomposer0 (() :: Constraint)
 type family   Decomposer0 (x :: Constraint) :: Constraint
 type instance Decomposer0 (f ) = f
 

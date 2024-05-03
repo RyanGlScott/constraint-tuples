@@ -18,6 +18,8 @@ module Data.Tuple.Constraint.TypeSynonym
   ( -- * Constraint tuples
     CTuple0
   , CTuple1
+  , CUnit
+  , CSolo
   , CTuple2
   , CTuple3
   , CTuple4
@@ -87,12 +89,13 @@ module Data.Tuple.Constraint.TypeSynonym
 #endif
   ) where
 
-import Data.Tuple.Constraint (CTuple1)
+import Data.Tuple.Constraint (CTuple0, CTuple1, CSolo)
 import Data.Kind (Constraint)
 import Data.Proxy (Proxy(..))
 
+
 -- | A type alias for a constraint tuple with 0 arguments.
-type CTuple0 = Decomposer0 ('Proxy :: Proxy (() :: Constraint))
+type CUnit = Decomposer0 ('Proxy :: Proxy (() :: Constraint))
 type Decomposer0 (x :: Proxy ((f :: Constraint) )) = f
 
 -- | A type alias for a constraint tuple with 2 arguments.

@@ -14,6 +14,8 @@ module Data.Tuple.Constraint
   ( -- * Constraint tuples
     CTuple0
   , CTuple1
+  , CUnit
+  , CSolo
   , CTuple2
   , CTuple3
   , CTuple4
@@ -83,15 +85,21 @@ module Data.Tuple.Constraint
 #endif
   ) where
 
+import Data.Kind (Constraint)
+
+-- | An alias for a nullary constraint tuple.
+type CTuple0 = (() :: Constraint)
+
+-- | An alias for a unary constraint tuple.
+type CTuple1 = CSolo
+
 -- | A constraint tuple class with 0 arguments.
---
--- This class is only defined on GHC 7.8 or later.
-class    () => CTuple0
-instance () => CTuple0
+class    () => CUnit
+instance () => CUnit
 
 -- | A constraint tuple class with 1 argument.
-class    c1 => CTuple1 c1
-instance c1 => CTuple1 c1
+class    c1 => CSolo c1
+instance c1 => CSolo c1
 
 -- | A constraint tuple class with 2 arguments.
 class    (c1, c2) => CTuple2 c1 c2

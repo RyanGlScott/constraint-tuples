@@ -1,5 +1,7 @@
 ## next [????.??.??]
 * Drop support for GHC 7.10 and earlier.
+* Provide nullary constraint tuples named `CUnit` and unary constraint tuples
+  named `CSolo` for consistency with `GHC.Classes` in GHC 9.10+.
 * Provide constraint tuples up to size 64 when building with GHC 9.2 or later.
   (Earlier versions of GHC impose a maximum tuple size of 62.)
 
