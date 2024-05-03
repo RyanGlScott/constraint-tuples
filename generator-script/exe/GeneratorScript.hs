@@ -51,10 +51,16 @@ generate args@Args{output} =
   let sourceCode = unlines $ preamble args ++ decs args in
   writeFile output sourceCode
 
+tupleName :: Int -> String
+tupleName n
+  | n == 0    = "CUnit"
+  | n == 1    = "CSolo"
+  | otherwise = "CTuple" ++ show n
+
 genClassDef :: Bool -> Int -> String
 genClassDef classNewtype n =
      parens (concat (intersperse ", " cNums))
-  ++ " => CTuple" ++ show n
+  ++ " => " ++ tupleName n
   ++ [ ' ' | n > 0 ]
   ++ unwords cNums
   where
@@ -86,9 +92,7 @@ resKind n = concat $ intersperse " -> " $ replicate (n+1) "Constraint"
 genAlias :: Bool -- True for type families, False for type synonyms
          -> Int -> String
 genAlias typeFams i =
-     "type CTuple"
-  ++ show i ++ " = Decomposer"
-  ++ show i ++ " (" ++ arg ++ ")"
+     "type " ++ tupleName i ++ " = Decomposer" ++ show i ++ " (" ++ arg ++ ")"
   where
     arg :: String
     arg | typeFams  = dummyClass
@@ -106,12 +110,7 @@ classDefHaddocks :: Int -> [String]
 classDefHaddocks i =
   [ "-- | A constraint tuple class with " ++ show i ++
     " argument" ++ pluralSuffix i ++ "."
-  ] ++
-  if i == 0
-  then [ "--"
-       , "-- This class is only defined on GHC 7.8 or later."
-       ]
-  else []
+  ]
 
 aliasHaddocks :: Int -> String
 aliasHaddocks i =
@@ -175,25 +174,25 @@ preamble Args{mode} =
     exports :: [String]
     exports =
       [ "  ( -- * Constraint tuples"
+      , "    CTuple0"
+      , "  , CTuple1"
       ] ++ cTupleExports ++
       [ "  ) where" ]
 
     cTupleExports :: [String]
     cTupleExports =
       flip concatMap [0..maxTupleSize] $ \i ->
-        case i of
-          0 -> [ "    CTuple0" ]
-          _ -> [ "#if __GLASGOW_HASKELL__ >= 902" | largeTupleSize i ] ++
-               [ "  , CTuple" ++ show i ] ++
-               [ "#endif" | largeTupleSize i ]
+        [ "#if __GLASGOW_HASKELL__ >= 902" | largeTupleSize i ] ++
+        [ "  , " ++ tupleName i ] ++
+        [ "#endif" | largeTupleSize i ]
 
     imports :: [String]
     imports =
       case mode of
-        Default      -> []
+        Default      -> [ "import Data.Kind (Constraint)" ]
         ClassNewtype -> constraintImports
         TypeFamily   -> constraintImports
-        TypeSynonym  -> [ cTuple1Import
+        TypeSynonym  -> [ dtcImports
                         , "import Data.Kind (Constraint)"
                         , "import Data.Proxy (Proxy(..))"
                         , ""
@@ -201,12 +200,12 @@ preamble Args{mode} =
 
     constraintImports :: [String]
     constraintImports =
-      [ cTuple1Import
+      [ dtcImports
       , "import Data.Kind (Constraint)"
       ]
 
-    cTuple1Import :: String
-    cTuple1Import = "import Data.Tuple.Constraint (CTuple1)"
+    dtcImports :: String
+    dtcImports = "import Data.Tuple.Constraint (CTuple0, CTuple1, CSolo)"
 
     haddockNote :: [String]
     haddockNote =
@@ -256,9 +255,11 @@ preamble Args{mode} =
 
 decs :: Args -> [String]
 decs Args{mode} =
+  extraDefs ++
+  [ "" ] ++
   flip concatMap [0..maxTupleSize] (\i ->
     if mode /= Default && i == 1
-    then [] -- CTuple1 is imported from Data.Tuple.Constraint
+    then [] -- CSolo is imported from Data.Tuple.Constraint
     else case mode of
            Default      -> genClassDefs False i
            ClassNewtype -> genClassDefs True  i
@@ -266,6 +267,19 @@ decs Args{mode} =
            TypeSynonym  -> genAliasDefs False i
          ++ [ "" ])
   where
+    extraDefs :: [String]
+    extraDefs =
+      concat
+        [ [ ""
+          , "-- | An alias for a nullary constraint tuple."
+          , "type CTuple0 = (() :: Constraint)"
+          , ""
+          , "-- | An alias for a unary constraint tuple."
+          , "type CTuple1 = CSolo"
+          ]
+        | mode == Default
+        ]
+
     genClassDefs :: Bool -- Should the classes be newtypes?
                  -> Int -> [String]
     genClassDefs classNewtype i =

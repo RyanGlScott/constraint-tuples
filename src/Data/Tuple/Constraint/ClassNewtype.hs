@@ -41,6 +41,8 @@ module Data.Tuple.Constraint.ClassNewtype
   ( -- * Constraint tuples
     CTuple0
   , CTuple1
+  , CUnit
+  , CSolo
   , CTuple2
   , CTuple3
   , CTuple4
@@ -110,13 +112,12 @@ module Data.Tuple.Constraint.ClassNewtype
 #endif
   ) where
 
-import Data.Tuple.Constraint (CTuple1)
+import Data.Tuple.Constraint (CTuple0, CTuple1, CSolo)
 import Data.Kind (Constraint)
+
 -- | A constraint tuple class with 0 arguments.
---
--- This class is only defined on GHC 7.8 or later.
-class    (() :: Constraint) => CTuple0
-instance (() :: Constraint) => CTuple0
+class    (() :: Constraint) => CUnit
+instance (() :: Constraint) => CUnit
 
 -- | A constraint tuple class with 2 arguments.
 class    ((c1, c2) :: Constraint) => CTuple2 c1 c2
