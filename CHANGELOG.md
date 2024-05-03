@@ -1,4 +1,4 @@
-## next [????.??.??]
+## 0.2 [????.??.??]
 * Drop support for GHC 7.10 and earlier.
 * When building with GHC 9.10 or later, `Data.Tuple.Constraint` will simply
   re-export constraint tuple definitions found in `GHC.Classes`. If building
