@@ -1,26 +1,19 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE Safe #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE UndecidableInstances #-}
-#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
-{-# LANGUAGE NullaryTypeClasses #-}
-#endif
-#if __GLASGOW_HASKELL__ >= 800
 {-# LANGUAGE UndecidableSuperClasses #-}
-#endif
-{-# LANGUAGE Safe #-}
 
 -- | This module provides classes that emulate the behavior of GHC's constraint
 -- tuple syntax. Unlike GHC's built-in constraint tuples, the classes in this
 -- library can be partially applied.
 module Data.Tuple.Constraint
   ( -- * Constraint tuples
-#if __GLASGOW_HASKELL__ >= 708
-    CTuple0,
-#endif
-    CTuple1
+    CTuple0
+  , CTuple1
   , CTuple2
   , CTuple3
   , CTuple4
@@ -90,13 +83,11 @@ module Data.Tuple.Constraint
 #endif
   ) where
 
-#if __GLASGOW_HASKELL__ >= 708
 -- | A constraint tuple class with 0 arguments.
 --
 -- This class is only defined on GHC 7.8 or later.
 class    () => CTuple0
 instance () => CTuple0
-#endif
 
 -- | A constraint tuple class with 1 argument.
 class    c1 => CTuple1 c1

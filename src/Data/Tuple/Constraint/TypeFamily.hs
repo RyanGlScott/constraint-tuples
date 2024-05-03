@@ -1,12 +1,8 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE TypeFamilies #-}
-#if __GLASGOW_HASKELL__ >= 800
 {-# LANGUAGE Safe #-}
-#else
-{-# LANGUAGE Trustworthy #-}
-#endif
+{-# LANGUAGE TypeFamilies #-}
 
 -- | This module provides type aliases that emulate the behavior of GHC's constraint
 -- tuple syntax. Unlike GHC's built-in constraint tuples, the type aliases in this
@@ -88,12 +84,7 @@ module Data.Tuple.Constraint.TypeFamily
   ) where
 
 import Data.Tuple.Constraint (CTuple1)
-#if __GLASGOW_HASKELL__ >= 800
 import Data.Kind (Constraint)
-#else
-import GHC.Exts (Constraint)
-#endif
-
 -- | A type alias for a constraint tuple with 0 arguments.
 type CTuple0 = Decomposer0 (() :: Constraint)
 type family   Decomposer0 (x :: Constraint) :: Constraint

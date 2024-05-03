@@ -129,19 +129,18 @@ preamble Args{mode} =
   [ "{-# LANGUAGE ConstraintKinds #-}"
   , "{-# LANGUAGE CPP #-}"
   , "{-# LANGUAGE KindSignatures #-}"
+  , "{-# LANGUAGE Safe #-}"
   ] ++ case mode of
          Default      -> classDefExts
          ClassNewtype -> classDefExts
          TypeFamily   -> [ "{-# LANGUAGE TypeFamilies #-}" ]
-         TypeSynonym  -> [ "#if __GLASGOW_HASKELL__ >= 800"
-                         , "{-# LANGUAGE DataKinds #-}"
+         TypeSynonym  -> [ "{-# LANGUAGE DataKinds #-}"
                          , "{-# LANGUAGE PolyKinds #-}"
-                         , "# if __GLASGOW_HASKELL__ < 806"
+                         , "#if __GLASGOW_HASKELL__ < 806"
                          , "{-# LANGUAGE TypeInType #-}"
-                         , "# endif"
                          , "#endif"
                          ]
-    ++ safeHaskell ++
+    ++
   [ ""
   , "-- | This module provides " ++ things ++ " that emulate the behavior of GHC's constraint"
   , "-- tuple syntax. Unlike GHC's built-in constraint tuples, the " ++ things ++ " in this"
@@ -157,12 +156,7 @@ preamble Args{mode} =
       [ "{-# LANGUAGE FlexibleInstances #-}"
       , "{-# LANGUAGE MultiParamTypeClasses #-}"
       , "{-# LANGUAGE UndecidableInstances #-}"
-      , "#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710"
-      , "{-# LANGUAGE NullaryTypeClasses #-}"
-      , "#endif"
-      , "#if __GLASGOW_HASKELL__ >= 800"
       , "{-# LANGUAGE UndecidableSuperClasses #-}"
-      , "#endif"
       ]
 
     things :: String
@@ -180,37 +174,18 @@ preamble Args{mode} =
 
     exports :: [String]
     exports =
-      concat
-        [ if mode == TypeSynonym
-          then [ "#if __GLASGOW_HASKELL__ < 800"
-               , "  () where"
-               , "#else"
-               ]
-          else []
-        , [ "  ( -- * Constraint tuples"
-          ] ++ cTupleExports ++
-          [ "  ) where" ]
-        ]
+      [ "  ( -- * Constraint tuples"
+      ] ++ cTupleExports ++
+      [ "  ) where" ]
 
     cTupleExports :: [String]
     cTupleExports =
       flip concatMap [0..maxTupleSize] $ \i ->
         case i of
-          0 ->
-               if mode `elem` classDefModes
-               then [ "#if __GLASGOW_HASKELL__ >= 708"
-                    , "    CTuple0,"
-                    , "#endif"
-                    ]
-               else [ "    CTuple0" ]
-          1 |  mode `elem` classDefModes
-            -> [ "    CTuple1" ]
+          0 -> [ "    CTuple0" ]
           _ -> [ "#if __GLASGOW_HASKELL__ >= 902" | largeTupleSize i ] ++
                [ "  , CTuple" ++ show i ] ++
                [ "#endif" | largeTupleSize i ]
-      where
-        classDefModes :: [Mode]
-        classDefModes = [Default, ClassNewtype]
 
     imports :: [String]
     imports =
@@ -227,36 +202,11 @@ preamble Args{mode} =
     constraintImports :: [String]
     constraintImports =
       [ cTuple1Import
-      , "#if __GLASGOW_HASKELL__ >= 800"
       , "import Data.Kind (Constraint)"
-      , "#else"
-      , "import GHC.Exts (Constraint)"
-      , "#endif"
-      , ""
       ]
 
     cTuple1Import :: String
     cTuple1Import = "import Data.Tuple.Constraint (CTuple1)"
-
-    safeHaskell :: [String]
-    safeHaskell =
-      case mode of
-        Default      -> [ safe ]
-        ClassNewtype -> safeOn8'0OrLater
-        TypeFamily   -> safeOn8'0OrLater
-        TypeSynonym  -> [ safe ]
-
-    safe :: String
-    safe = "{-# LANGUAGE Safe #-}"
-
-    safeOn8'0OrLater :: [String]
-    safeOn8'0OrLater =
-      [ "#if __GLASGOW_HASKELL__ >= 800"
-      , safe
-      , "#else"
-      , "{-# LANGUAGE Trustworthy #-}"
-      , "#endif"
-      ]
 
     haddockNote :: [String]
     haddockNote =
@@ -302,12 +252,7 @@ preamble Args{mode} =
       , "-- The type aliases in this module are defined by way of "
           ++ if typeFams then "type families" else "type synonyms" ++ " that"
       , "-- decompose applications of constraint tuple type constructors to their arguments."
-      ] ++
-      if typeFams
-      then []
-      else [ "-- This requires the use of GHC capabilities that are only present on GHC 8.0 or"
-           , "-- later, so this module does not export anything on earlier versions of GHC."
-           ]
+      ]
 
 decs :: Args -> [String]
 decs Args{mode} =
@@ -320,20 +265,18 @@ decs Args{mode} =
            TypeFamily   -> genAliasDefs True  i
            TypeSynonym  -> genAliasDefs False i
          ++ [ "" ])
-  ++ [ "#endif" | mode == TypeSynonym ]
   where
     genClassDefs :: Bool -- Should the classes be newtypes?
                  -> Int -> [String]
     genClassDefs classNewtype i =
       let cTuple = genClassDef classNewtype i in
       concat
-        [ [ "#if __GLASGOW_HASKELL__ >= 708" | i == 0 ]
-        , [ "#if __GLASGOW_HASKELL__ >= 902" | largeTupleSize i ]
+        [ [ "#if __GLASGOW_HASKELL__ >= 902" | largeTupleSize i ]
         , classDefHaddocks i
         , [ "class    " ++ cTuple
           , "instance " ++ cTuple
           ]
-        , [ "#endif" | i == 0 || largeTupleSize i ]
+        , [ "#endif" | largeTupleSize i ]
         ]
 
     genAliasDefs :: Bool -- True for type families, False for type synonyms
