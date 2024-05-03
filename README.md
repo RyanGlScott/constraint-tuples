@@ -32,6 +32,4 @@ API with slight differences in their implementation:
   type family axiom.
 * `Data.Tuple.Constraint.TypeSynonym`: A `CTupleN` type alias is a constraint
   tuple type constructor with `N` arguments obtained by way of a type synonym.
-  This will compile directly to a built-in constraint tuple, but because this
-  requires use of GHC features only present on 8.0 or later, this module does
-  not export anything on earlier versions of GHC.
+  This will compile directly to a built-in constraint tuple.

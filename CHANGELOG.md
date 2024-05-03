@@ -1,4 +1,5 @@
 ## next [????.??.??]
+* Drop support for GHC 7.10 and earlier.
 * Provide constraint tuples up to size 64 when building with GHC 9.2 or later.
   (Earlier versions of GHC impose a maximum tuple size of 62.)
 

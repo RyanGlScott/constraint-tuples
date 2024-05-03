@@ -1,20 +1,11 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE Safe #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE UndecidableInstances #-}
-#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
-{-# LANGUAGE NullaryTypeClasses #-}
-#endif
-#if __GLASGOW_HASKELL__ >= 800
 {-# LANGUAGE UndecidableSuperClasses #-}
-#endif
-#if __GLASGOW_HASKELL__ >= 800
-{-# LANGUAGE Safe #-}
-#else
-{-# LANGUAGE Trustworthy #-}
-#endif
 
 -- | This module provides classes that emulate the behavior of GHC's constraint
 -- tuple syntax. Unlike GHC's built-in constraint tuples, the classes in this
@@ -48,10 +39,8 @@
 -- construct a @Dict@ dictionary.
 module Data.Tuple.Constraint.ClassNewtype
   ( -- * Constraint tuples
-#if __GLASGOW_HASKELL__ >= 708
-    CTuple0,
-#endif
-    CTuple1
+    CTuple0
+  , CTuple1
   , CTuple2
   , CTuple3
   , CTuple4
@@ -122,19 +111,12 @@ module Data.Tuple.Constraint.ClassNewtype
   ) where
 
 import Data.Tuple.Constraint (CTuple1)
-#if __GLASGOW_HASKELL__ >= 800
 import Data.Kind (Constraint)
-#else
-import GHC.Exts (Constraint)
-#endif
-
-#if __GLASGOW_HASKELL__ >= 708
 -- | A constraint tuple class with 0 arguments.
 --
 -- This class is only defined on GHC 7.8 or later.
 class    (() :: Constraint) => CTuple0
 instance (() :: Constraint) => CTuple0
-#endif
 
 -- | A constraint tuple class with 2 arguments.
 class    ((c1, c2) :: Constraint) => CTuple2 c1 c2
