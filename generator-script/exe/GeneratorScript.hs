@@ -189,14 +189,22 @@ preamble Args{mode} =
     imports :: [String]
     imports =
       case mode of
-        Default      -> [ "import Data.Kind (Constraint)" ]
+        Default      -> defaultImports
         ClassNewtype -> constraintImports
         TypeFamily   -> constraintImports
         TypeSynonym  -> [ dtcImports
                         , "import Data.Kind (Constraint)"
                         , "import Data.Proxy (Proxy(..))"
-                        , ""
                         ]
+
+    defaultImports :: [String]
+    defaultImports =
+      [ "#if __GLASGOW_HASKELL__ >= 910"
+      , "import GHC.Classes"
+      , "#else"
+      , "import Data.Kind (Constraint)"
+      , "#endif"
+      ]
 
     constraintImports :: [String]
     constraintImports =
@@ -211,7 +219,10 @@ preamble Args{mode} =
     haddockNote =
       case mode of
         Default ->
-          []
+          [ "--"
+          , "-- When building with GHC 9.10 or later, this will simply re-export the"
+          , "-- constraint tuples offered by \"GHC.Classes\"."
+          ]
         ClassNewtype ->
           [ "--"
           , "-- Unlike \"Data.Tuple.Constraint\", a @CTupleN@ class defined in this module"
@@ -255,27 +266,36 @@ preamble Args{mode} =
 
 decs :: Args -> [String]
 decs Args{mode} =
-  extraDefs ++
-  [ "" ] ++
-  flip concatMap [0..maxTupleSize] (\i ->
-    if mode /= Default && i == 1
-    then [] -- CSolo is imported from Data.Tuple.Constraint
-    else case mode of
-           Default      -> genClassDefs False i
-           ClassNewtype -> genClassDefs True  i
-           TypeFamily   -> genAliasDefs True  i
-           TypeSynonym  -> genAliasDefs False i
-         ++ [ "" ])
+  concat
+    [ concat
+        [ [ ""
+          , "#if __GLASGOW_HASKELL__ < 910"
+          ]
+        | mode == Default
+        ]
+    , [ "" ]
+    , extraDefs
+    , flip concatMap [0..maxTupleSize] (\i ->
+        if mode /= Default && i == 1
+        then [] -- CSolo is imported from Data.Tuple.Constraint
+        else case mode of
+               Default      -> genClassDefs False i
+               ClassNewtype -> genClassDefs True  i
+               TypeFamily   -> genAliasDefs True  i
+               TypeSynonym  -> genAliasDefs False i
+             ++ [ "" ])
+    , [ "#endif" | mode == Default ]
+    ]
   where
     extraDefs :: [String]
     extraDefs =
       concat
-        [ [ ""
-          , "-- | An alias for a nullary constraint tuple."
+        [ [ "-- | An alias for a nullary constraint tuple."
           , "type CTuple0 = (() :: Constraint)"
           , ""
           , "-- | An alias for a unary constraint tuple."
           , "type CTuple1 = CSolo"
+          , ""
           ]
         | mode == Default
         ]

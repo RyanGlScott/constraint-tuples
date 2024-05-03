@@ -93,7 +93,6 @@ import Data.Tuple.Constraint (CTuple0, CTuple1, CSolo)
 import Data.Kind (Constraint)
 import Data.Proxy (Proxy(..))
 
-
 -- | A type alias for a constraint tuple with 0 arguments.
 type CUnit = Decomposer0 ('Proxy :: Proxy (() :: Constraint))
 type Decomposer0 (x :: Proxy ((f :: Constraint) )) = f
