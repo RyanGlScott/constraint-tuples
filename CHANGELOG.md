@@ -1,3 +1,6 @@
+### next [????.??.??]
+* Only depend on `ghc-prim` with GHC 9.10 or later.
+
 ## 0.2 [2024.05.03]
 * Drop support for GHC 7.10 and earlier.
 * When building with GHC 9.10 or later, `Data.Tuple.Constraint` will simply
